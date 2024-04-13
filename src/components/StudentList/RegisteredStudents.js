@@ -6,47 +6,82 @@ import { useParams } from 'react-router-dom';
 const RegisteredStudents = () => {
     const { id } = useParams();
     const [applicant, setApplicant] = useState([]);
+    const token = JSON.parse(localStorage.getItem('token'));
 
-    const handleDeleteStudent = async (campaignId, studentId) => {
-    try {
-        const response = await fetch(`https://project-software-z6dy.onrender.com/applicant/${campaignId}/${studentId}`, {
-            method: 'DELETE',
-            headers: {
-                'accept': '*/*',
-                'Authorization': 'Bearer ' + token
+
+    const handleDeleteStudent = async (studentId, strategyId) => {
+        try {
+            const response = await fetch(`https://project-software-z6dy.onrender.com/applicant/${studentId}/${strategyId}`, {
+                method: 'DELETE',
+                headers: {
+                    'accept': '*/*',
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+    
+            const data = await response.json();
+    
+           
+            if (response.ok) {
+                console.log('Student deleted successfully:', data);
+                // handleDeleteStudent(studentId, strategyId);
+                handleGetApplicant();
+             
+            } else {
+              
+                console.error('Failed to delete student:', data?.message);
             }
-        });
-
-        const data = await response.json();
-
-        // Handle the response data here
-        if (response.ok) {
-            console.log('Student deleted successfully:', data);
-            // Thực hiện các hành động khác sau khi xóa sinh viên thành công
-        } else {
-            // Handle the error response here
-            console.error('Failed to delete student:', data?.message);
+        } catch (error) {
+           
+            console.error('Error deleting student:', error);
         }
-    } catch (error) {
-        // Handle any errors here
-        console.error('Error deleting student:', error);
     }
-}
+
+    
 
 
 
+    // const CustomButton = () => (
+        
+    //     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+    //         <div>
+    //             <Button style={{ backgroundColor: 'green', margin: '6px' }}>Xác nhận</Button>
+    //         </div>
+    //         <div>
+    //             <Button  
+    //             onClick={handleDeleteStudent(parseInt(applicant.id), id )}
+    //              style={{ backgroundColor: 'red', margin: '6px' }}>Hủy</Button>
+    //         </div>
+    //     </div>
+    // );
 
-    const CustomButton = () => (
-        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            <div>
-                <Button style={{ backgroundColor: 'green', margin: '6px' }}>Xác nhận</Button>
+    const CustomButton = ({ index }) => {
+        const handleCancelClick = async () => {
+            try {
+                if (applicant.length > index) {
+                    const studentId = applicant[index].id;
+                    await handleDeleteStudent(studentId, id);
+                    console.log('Student deleted successfully:', studentId);
+                } else {
+                    console.error('Invalid index or no applicant found at this index.');
+                }
+            } catch (error) {
+                console.error('Error deleting student:', error);
+            }
+        };
+    
+        return (
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <div>
+                    <Button style={{ backgroundColor: 'green', margin: '6px' }}>Xác nhận</Button>
+                </div>
+                <div>
+                    <Button onClick={handleCancelClick} style={{ backgroundColor: 'red', margin: '6px' }}>Hủy</Button>
+                </div>
             </div>
-            <div>
-                <Button style={{ backgroundColor: 'red', margin: '6px' }}>Hủy</Button>
-            </div>
-        </div>
-    );
-
+        );
+    };
+    
     const columns = [
         {
             name: 'Họ và Tên',
@@ -66,12 +101,12 @@ const RegisteredStudents = () => {
         },
         {
             name: ' ',
-            selector: row => <CustomButton/>,
+            selector: (row, index) => <CustomButton index={index} />,
             sortable: true,
-        },
+        }
     ];
 
-    const token = JSON.parse(localStorage.getItem('token'));
+  
     const apiUrl = `https://project-software-z6dy.onrender.com/applicant?strategy=${id}&status=0`;
 
     const handleGetApplicant = async () => {

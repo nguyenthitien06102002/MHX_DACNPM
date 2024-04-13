@@ -11,19 +11,69 @@ import { useParams } from 'react-router-dom';
 const Confirmed = () => {
     const { id } = useParams();
     const [applicant, setApplicant] = useState([]);
-    const CustomButton = ({ onClick }) => (
-        <div style={{display: 'flex', justifyContent: 'space-around'}}>
-            {/* <div>
-   <Button style={{backgroundColor: 'green', margin: '6px'}}>Xác nhận</Button>
-            </div> */}
+//     const CustomButton = ({ onClick }) => (
+//         <div style={{display: 'flex', justifyContent: 'space-around'}}>
+//             {/* <div>
+//    <Button style={{backgroundColor: 'green', margin: '6px'}}>Xác nhận</Button>
+//             </div> */}
    
-            <div>
+//             <div>
 
-<Button style={{backgroundColor: 'red', margin: '6px'}}>Xóa</Button>
-         </div>
-    </div>
+// <Button style={{backgroundColor: 'red', margin: '6px'}}>Xóa</Button>
+//          </div>
+//     </div>
      
-      );
+//       );
+const handleDeleteStudent = async (studentId, strategyId) => {
+    try {
+        const response = await fetch(`https://project-software-z6dy.onrender.com/applicant/${studentId}/${strategyId}`, {
+            method: 'DELETE',
+            headers: {
+                'accept': '*/*',
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        const data = await response.json();
+
+       
+        if (response.ok) {
+            console.log('Student deleted successfully:', data);
+            // handleDeleteStudent(studentId, strategyId);
+            handleGetApplicant();
+         
+        } else {
+          
+            console.error('Failed to delete student:', data?.message);
+        }
+    } catch (error) {
+       
+        console.error('Error deleting student:', error);
+    }
+}
+const CustomButton = ({ index }) => {
+    const handleCancelClick = async () => {
+        try {
+            if (applicant.length > index) {
+                const studentId = applicant[index].id;
+                await handleDeleteStudent(studentId, id);
+                console.log('Student deleted successfully:', studentId);
+            } else {
+                console.error('Invalid index or no applicant found at this index.');
+            }
+        } catch (error) {
+            console.error('Error deleting student:', error);
+        }
+    };
+
+    return (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            <div>
+                <Button onClick={handleCancelClick} style={{ backgroundColor: 'red', margin: '6px' }}>Hủy</Button>
+            </div>
+        </div>
+    );
+};
     const columns = [
         {
             name: 'Họ và Tên',
@@ -43,11 +93,9 @@ const Confirmed = () => {
         },
         {
             name: ' ',
-            selector: row => <CustomButton/>,
-              sortable: true,
-           
-              
-        },
+            selector: (row, index) => <CustomButton index={index} />,
+            sortable: true,
+        }
         // {
         //     name: 'Xác nhận',
         //     cell: row => <CustomButton onClick={() => console.log("Xác nhận", row.id)} />,
