@@ -1,4 +1,5 @@
 import { DatePicker } from 'antd';
+import axios from 'axios';
 import moment from 'moment';
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -9,10 +10,8 @@ const CreateCampaigns = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedDateEnd, setSelectedDateEnd] = useState(null);
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-    const token = JSON.parse(localStorage.getItem('token'));
-    const [universities, setUniversity] = useState([]);
+    // const token = JSON.parse(localStorage.getItem('token'));
     const [name, setName] = useState('');
-    const [university, setUniversities] = useState('');
     const [place, setPlace] = useState('');
     const [startAt, setStartAt] = useState('');
     const [endAt, setEndAt] = useState('');
@@ -45,90 +44,61 @@ const CreateCampaigns = () => {
         "Với 02 đội hình cấp tỉnh được phát động từ năm 2022, bao gồm đội hình “Gia sư áo xanh” và đội hình “Bảo vệ mầm xanh” đã tạo được nhiều dấu ấn về hình ảnh “đem trí tuệ vào hoạt động tình nguyện”. Năm 2023, đội hình “Gia sư áo xanh” đã tổ chứ giảng dạy cho hơn 500 em học sinh với 11 lớp dạy tiếng Anh, 02 lớp Toán và 01 lớp tiếng Việt ở trên địa bàn thành phố Biên Hòa, huyện Thống Nhất và huyện Tân Phú; đội hình “Bảo vệ mầm xanh” ra quân ở địa điểm chùa Pháp Tuyền và Lữ đoàn Công binh 25 đã tổ chức các buổi về giáo dục giới tính và phòng chống xâm hại tình dục cho hơn 200 em học sinh.",
         "Sau 3 tháng triển khai chiến dịch, nhiều bạn sinh viên chia sẻ: “Mùa hè xanh là đi để cảm nhận, để được xa nhà và cùng ăn, cùng ở với bạn bè, Nhân dân, để bước chân đến nơi xa lạ, đem những kiến thức đã học được tại giảng đường để ứng dụng vào thực tiễn cuộc sống. Đó không chỉ mong ước, khát vọng của riêng bất kỳ một chiến sĩ tình nguyện nào, mà đó chính là mong ước khát vọng chung của tất cả những người làm công tác tình nguyện”."
     ];
-    // const token = JSON.parse(localStorage.getItem('token'));
-    const handleGetStrategies = async () => {
-        try {
-            const response = await fetch('https://project-software-z6dy.onrender.com/universities', {
-                method: 'GET',
-                headers: {
-                    'accept': '*/*',
-                    'Authorization': 'Bearer ' + token
-                },
-            });
+  
+    //lấy danh sách trường
+    const [universities, setUniversities] = useState([]);
+    useEffect(() => {
+        const fetchUniversities = async () => {
+            try {
+                const response = await fetch('http://localhost:3700/universities/getAll');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch universities');
+                }
+                const data = await response.json();
+                setUniversities(data);
+                console.log(data);
 
-            const data = await response.json();
-
-            // Handle the response data here
-            if (response.ok) {
-                setUniversity(data.data);
-                console.log(data.data); // Check the fetched data
-               
-            } else {
-                // Handle the error response here
-                console.error(data?.message);
-            }
-        } catch (error) {
-            // Handle any errors here
-            console.error(error);
-        }
-    }
-    const handleCreateCampaigns = async () => {
-        try {
-            const response = await fetch('https://project-software-z6dy.onrender.com/strategy', {
-                method: 'POST',
-                headers: {
-                    'accept': '*/*',
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: name,
-                    university: university,
-                    place: place,
-                    startAt: selectedDate,
-                    endAt: selectedDateEnd,
-                    image: image,
-                    description: description
-                }),
-            });
-
-            const data = await response.json();
-
-            // Handle the response data here
-            if (response.ok) {
-                console.log(data)
-                window.location.href = '/listProjectAdmin'
-
-            } else {
-                // Handle the error response here
-                console.error(data?.message);
+            } catch (error) {
+                console.error('Error fetching universities:', error);
 
             }
+        };
+
+        fetchUniversities();
+    }, []);
+
+    const [universityId, setUniversityId] = useState();
+
+    const handleUniversityChange = (e) => {
+        const selectedUniversityId = e.target.value;
+        console.log('Selected University ID:', selectedUniversityId);
+        setUniversityId(selectedUniversityId);
+    };
+
+
+    const handleSubmit = async () => {
+        // e.preventDefault();
+        try {
+
+            const response = await axios.post('http://localhost:3700/campaigns/campaign', {
+                image: image,
+                title: name, 
+                description: description,
+                startAt: selectedDate,
+                endAt: selectedDateEnd, 
+                status: 0, 
+                universityId : universityId
+            });
+          
+            alert('Tạo chiến dịch thành công');
+            window.location.href = '/listProjectAdmin';
+         
         } catch (error) {
-            // Handle any errors here
-            console.error(error);
-
+            console.error('Error registering user:', error);
+            alert('Error');
         }
-    }
+    };
 
-
-    useEffect(() => {
-        handleGetStrategies();
-    }, [])
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentBannerIndex(prevIndex => (prevIndex + 1) % banners.length);
-        }, 5000); // Thay đổi banner sau mỗi 5 giây
-
-        return () => clearInterval(interval);
-    }, [banners.length]);
-
-    const role = JSON.parse(localStorage.getItem('role'));
-    if ((role !== 0)) {
-        return <Navigate to="/login" />; // hoặc trang bạn muốn chuyển hướng khi không có token
-    }
-    console.log(university);
 
     return (
         <div style={{ marginTop: '0', backgroundColor: "#1977cc", height: "fit-content", padding: "10px", textAlign: "center" }}>
@@ -145,19 +115,21 @@ const CreateCampaigns = () => {
                                 </div>
                                 <div className="col-md-12 mb-2">
                                     <label className="form-label">Trường:</label>
-                                    <select className="form-control" onChange={(e) => setUniversities(parseInt(e.target.value))}>
-                                        <option value="">Chọn trường</option> {/* Default option */}
-                                        {universities.map((university) => (
-                                            <option key={university.id} value={university.id}>{university.name}</option>
+                                    <select className="form-control" onChange={handleUniversityChange}>
+                                        <option value="">Select a University</option>
+                                        {universities.map(university => (
+                                            <option key={university.id} value={university.id}>
+                                                {university.name}
+                                            </option>
                                         ))}
                                     </select>
                                     {/* <select className="form-control" onChange={(e) => setUniversities(parseInt(e.target.value))}></select> */}
                                 </div>
                                 <div className="row">
-                                    <div className="col-md-4 mb-2">
+                                    {/* <div className="col-md-4 mb-2">
                                         <label className="form-label">Địa điểm:</label>
                                         <input className="form-control" onChange={(e) => setPlace(e.target.value)} placeholder='Địa điểm' />
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-4 mb-2">
                                         <label className="form-label">Thời gian bắt đầu:</label>
                                         <DatePicker
@@ -188,7 +160,7 @@ const CreateCampaigns = () => {
 
                             </form>
                             <div className="text-center mt-3 mb-5 col-md-12 ">
-                                <button style={{ backgroundColor: "#1977cc" }} className="form-control" background="blue" onClick={() => { handleCreateCampaigns() }}>Tạo</button>
+                                <button style={{ backgroundColor: "#1977cc" }} className="form-control" background="blue" onClick={handleSubmit}>Tạo</button>
                             </div>
                         </div>
                     </div>
