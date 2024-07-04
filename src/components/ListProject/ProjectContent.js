@@ -11,57 +11,32 @@ import { FcLike } from "react-icons/fc";
 
 const ProjectContent = ({ strategiesItem, updateStrategiesList }) => {
     const [imageError, setImageError] = useState(false);
-    const token = JSON.parse(localStorage.getItem('token'));
-
-    const handleDeleteStrategy = async (strategyId) => {
-        try {
-          const response = await fetch(`https://project-software-z6dy.onrender.com/strategy/${strategiesItem.id}`, {
-            method: 'DELETE',
-            headers: {
-              'Authorization': 'Bearer ' + token
-            }
-          });
-      
-          const data = await response.json();
-         
-          if (response.ok) {
-          
-            console.log('Chiến dịch đã được xóa thành công');
-          
-            updateStrategiesList();
-          } else {
-           
-            console.error(data?.message);
-          }
-        } catch (error) {
-         
-          console.error(error);
-        }
-      };
+  
+   
 
 
-    // const services = data?.services?.split(',')
+  
     return (
         <div className="mb-4 rounded" style={{ background: '#f3f3f3' }}>
             <div className='d-flex p-3 justify-content-between align-items-center'>
                     <div className='doc-img-fluid d-flex align-items-center'>
                         {/* { data?.img && <img src={data?.img} className="" alt="User Image" />} */}
                         <img
-                            src={imageError || !strategiesItem.image ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbFl4LFohrLy-RNdC7vp_c8M6PR0FFm55OxxjlmsIxow&s' : strategiesItem.image}
+                            src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbFl4LFohrLy-RNdC7vp_c8M6PR0FFm55OxxjlmsIxow&s'
                             className=""
                             alt="User Image"
-                            onError={() => setImageError(true)}
+                          
                         />
                     </div>
                     <div className="doc-info">
-                        <h5 className='mb-0'><Link to={`/detail/studentList/1`}>{strategiesItem.name}</Link></h5>
+                        <h5 className='mb-0'><Link to={`/detail/studentList/1`}>Tên chiến dịch</Link></h5>
                         {/* <p className='m-0 form-text'>{strategiesItem.description}</p> */}
                         {/* <p className="doc-department m-0"><img src={showImg} className="img-fluid" alt="Speciality" />Urology</p> */}
 
 
                         <div className="clinic-details mt-2">
-                            <p className="form-text text-secondary"><FaLocationArrow /> {strategiesItem.place}</p>
-                            <p className="form-text text-secondary"><FaClock />Thời gian diễn ra: {strategiesItem.startAt.slice(0, 10)} – {strategiesItem.endAt.slice(0, 10)}</p>
+                            <p className="form-text text-secondary"><FaLocationArrow /> Địa điểm</p>
+                            <p className="form-text text-secondary"><FaClock />Thời gian diễn ra: 2023-01-01 – 2024-01-01</p>
                             <p className="form-text text-secondary">Đăng ký trước: 16/06/2023</p>
                             {/* <ul className="clinic-gallery mt-3">
                                 <li>
@@ -91,11 +66,11 @@ const ProjectContent = ({ strategiesItem, updateStrategiesList }) => {
                     </div>
                     <div className="clinic-booking">
                         <div  className='clinic-booking-button'>
-                            <Link to={`/detail/studentList/${strategiesItem.id}`} className="pro-btn" >   chi tiết   </Link>
+                            <Link to={`/detail/studentList/1`} className="pro-btn" >   chi tiết   </Link>
                         </div>
 
                         <div className='clinic-booking-button mt-2'>
-                            <Link onClick={handleDeleteStrategy} className="apt-btn">Xóa</Link>
+                            <Link  className="apt-btn">Xóa</Link>
 
                         </div>
                     </div>

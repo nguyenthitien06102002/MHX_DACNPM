@@ -23,49 +23,17 @@ const ListProject = ({ }) => {
   const itemsPerPage = 5;
 
   const [strategies, setStrategies] = useState([]);
-  const token = JSON.parse(localStorage.getItem('token'));
-  const handleGetStrategies = async () => {
-    try {
-      const response = await fetch('https://project-software-z6dy.onrender.com/strategies', {
-        method: 'GET',
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer ' + token
-        },
-      });
+  
+ 
 
-      const data = await response.json();
 
-      // Handle the response data here
-      if (response.ok) {
-        setStrategies(data.data.reverse());
-        console.log(data.data); // Check the fetched data
-      } else {
-        // Handle the error response here
-        console.error(data?.message);
-      }
-    } catch (error) {
-      // Handle any errors here
-      console.error(error);
-    }
-  }
-
-  const updateStrategiesList = () => {
-    // Cập nhật danh sách chiến dịch sau khi xóa thành công
-    handleGetStrategies();
-};
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = strategies.slice(indexOfFirstItem, indexOfLastItem);
 
-  useEffect(() => {
-    handleGetStrategies();
-  }, [])
-  const role = JSON.parse(localStorage.getItem('role'));
-  if ((role !== 0)) {
-    return <Navigate to="/login" />; // hoặc trang bạn muốn chuyển hướng khi không có token
-  }
+
+
   return (
     <div>
       <Header />
@@ -129,29 +97,16 @@ const ListProject = ({ }) => {
             <div className="col-md-12 col-lg-8 col-xl-9">
               {/* {content} */}
               <div className='text-center mt-5 mb-5'>
-                {/* {strategies.map((strategiesItem) => (
-                  <ProjectContent
-                    key={strategiesItem.id}
-                    strategiesItem={strategiesItem}
-                  />
-                ))} */}
-                {currentItems.map((strategiesItem) => (
-                  <ProjectContent
-                    key={strategiesItem.id}
-                    strategiesItem={strategiesItem}
-                    updateStrategiesList={updateStrategiesList}
-                  />
-                ))}
-
-
+                <ProjectContent  />
+ 
               </div>
               <div className="pagination-container">
-                <Pagination
+                {/* <Pagination
                   current={currentPage}
                   total={strategies.length}
                   pageSize={itemsPerPage}
                   onChange={(page) => setCurrentPage(page)}
-                />
+                /> */}
               </div>
             </div>
           </div>

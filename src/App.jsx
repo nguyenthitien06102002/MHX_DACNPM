@@ -18,6 +18,7 @@ import StudentList from './components/StudentList/StudentList';
 
 import ListProjectSV from './components/ListProject/ListProjectSV';
 import ManageSchools from './components/ListSchool/ManagementSchool';
+import SignUp from './components/Login/SignUp';
 
 
 
@@ -38,6 +39,7 @@ function App() {
         <Route path="/campaigns/:id" element={<CampaignDetails />} />
         <Route path='/detail/studentList/:id' element={<StudentList />} />
         <Route path='/school' element={<SearchSchool />} />
+        <Route path='/signUp' element={<SignUp />} />
         <Route path='/listProjectSV/:id' element={<ListProjectSV />} />
         <Route path='/manageSchools' element={<ManageSchools />} />
         <Route path='*' element={<NotFound />} />

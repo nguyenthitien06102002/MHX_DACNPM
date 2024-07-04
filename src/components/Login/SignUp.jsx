@@ -5,207 +5,151 @@ import Spinner from 'react-bootstrap/Spinner'
 import swal from 'sweetalert';
 import { useDoctorSignUpMutation, usePatientSignUpMutation } from '../../redux/api/authApi';
 import { message } from 'antd';
-
-// password regex
-// ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$
-// At least one upper case English letter, (?=.*?[A-Z])
-// At least one lower case English letter, (?=.*?[a-z])
-// At least one digit, (?=.*?[0-9])
-// At least one special character, (?=.*?[#?!@$%^&*-])
-// Minimum eight in length .{8,} (with the anchors)
+import axios from 'axios';
 
 const SignUp = ({ setSignUp }) => {
-    const [error, setError] = useState({});
-    const [infoError, setInfoError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const formField = {
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-    }
-    const [user, setUser] = useState(formField)
-    const [userType, setUserType] = useState('patient');
-    const [doctorSignUp, { data: dData, isSuccess: dIsSuccess, isError: dIsError, error: dError, isLoading: dIsLoading }] = useDoctorSignUpMutation();
-    const [patientSignUp, { data: pData, isSuccess: pIsSuccess, isError: pIsError, error: pError, isLoading: pIsLoading }] = usePatientSignUpMutation();
-    const [passwordValidation, setPasswordValidation] = useState({
-        carLength: false,
-        specailChar: false,
-        upperLowerCase: false,
-        numeric: false
-    })
-
-    const handleSignUpSuccess = () => {
-        setLoading(false);
-        setUser(formField)
-    }
+    //lấy danh sách trường
+    const [universities, setUniversities] = useState([]);
     useEffect(() => {
-        // doctor account
-        if (dIsError && dError) {
-            message.error("Email Already Exist !!")
-            setLoading(false);
-        }
+        const fetchUniversities = async () => {
+            try {
+                const response = await fetch('http://localhost:3700/universities/getAll');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch universities');
+                }
+                const data = await response.json();
+                setUniversities(data);
+                console.log(data);
 
-        if (!dIsError && dIsSuccess) {
-            handleSignUpSuccess();
-            setLoading(false);
-            setLoading(false);
-            swal({
-                icon: 'success',
-                text: `Successfully Account Created Please Verify Your email`,
-                timer: 5000
-            })
-        }
+            } catch (error) {
+                console.error('Error fetching universities:', error);
 
-        // Patient account
-        if (pIsError && pError) {
-            message.error("Email Already Exist !!")
-            setLoading(false);
-        }
-        if (!pIsError && pIsSuccess) {
-            handleSignUpSuccess();
-            setLoading(false);
-            setSignUp(false);
-            swal({
-                icon: 'success',
-                text: `Successfully ${userType === 'doctor' ? 'Doctor' : 'Patient'} Account Created Please Login`,
-                timer: 2000
-            })
-        }
+            }
+        };
 
-    }, [dIsError, dError, pError, pIsError, , pIsLoading, dIsLoading, pData, dData, setSignUp, setLoading, dIsSuccess])
+        fetchUniversities();
+    }, []);
 
-    const [emailError, setEmailError] = useState({
-        emailError: false
-    })
+ const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [universityId, setUniversityId] = useState();
+    const [name, setName] = useState('');
+    const [studentId, setStudentId] = useState('');
 
-    const handleEmailError = (name, value) => {
-        if (name === 'email') {
-            setEmailError({
-                emailError: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-            })
-        }
-    }
-    const hanldeValidation = (name, value) => {
-        if (name === 'password') {
-            setPasswordValidation({
-                carLength: (value.length > 8),
-                specailChar: /[ `!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(value),
-                upperLowerCase: /^(?=.*[a-z])(?=.*[A-Z])/.test(value),
-                numeric: /^(?=.*\d)/.test(value),
-            })
-        }
-    }
 
-    const hanldeOnChange = (e) => {
-        let { name, value } = e.target;
-        hanldeValidation(name, value)
-        handleEmailError(name, value)
-        let isPassValid = true;
+    const handleUniversityChange = (e) => {
+        const selectedUniversityId = e.target.value;
+        // console.log('Selected University ID:', selectedUniversityId);
+        setUniversityId(selectedUniversityId);
+    };
+   
 
-        if (value === 'email') {
-            isPassValid = /\S+@\S+\.\S+/.test(value);
-        }
-        if (value === 'password') {
-            isPassValid = ((value.length > 8)
-                && /[ `!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(value)
-                && /^(?=.*[a-z])(?=.*[A-Z])/.test(value)
-                && /^(?=.*\d)/.test(value))
-        }
-        if (isPassValid) {
-            const newPass = { ...user };
-            newPass[name] = value
-            setUser(newPass)
-        }
-    }
 
-    const handleUserTypeChange = (e) => {
-        setUserType(e.target.value);
-    }
-    const hanldeOnSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        if (userType === "doctor") {
-            doctorSignUp(user);
+    const handleEmailChange = (e) => {
+        const { value } = e.target;
+        setEmail(value);
+
+        // Kiểm tra định dạng email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            setEmailError('Email không đúng định dạng');
         } else {
-            patientSignUp(user)
+            setEmailError('');
         }
-    }
+    };
+
+    const handlePasswordChange = (e) => {
+        const { value } = e.target;
+        setPassword(value);
+
+        // Kiểm tra điều kiện password
+        const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+        if (!passwordRegex.test(value)) {
+            setPasswordError('Password phải có ít nhất 8 ký tự và 1 ký tự đặc biệt');
+        } else {
+            setPasswordError('');
+        }
+    };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+
+        try {
+
+            const response = await axios.post('http://localhost:3700/users/register', {
+                name: name,
+                studentId: studentId,
+                email: email,
+                password: password,
+                role: "student",
+                universityId: universityId
+            
+            });
+            // console.log('User registered successfully:', response.data);
+            alert('User registered successfully');
+            window.location.href = '/login'; 
+            // Optionally handle success, e.g., redirect to another page
+        } catch (error) {
+            console.error('Error registering user:', error);
+            alert('Error registering user');
+        }
+    };
 
     return (
-        <form className="sign-up-form" onSubmit={hanldeOnSubmit}>
-            <h2 className="title">Sign Up</h2>
-            <div className="input-field">
-                <span className="fIcon"><FaUser /></span>
-                <input placeholder="First Name" name="firstName" type="text" onChange={(e) => hanldeOnChange(e)} value={user.firstName} />
-            </div>
-            <div className="input-field">
-                <span className="fIcon"><FaUser /></span>
-                <input placeholder="Last Name" name="lastName" type="text" onChange={(e) => hanldeOnChange(e)} value={user.lastName} />
-            </div>
-            <div className="input-field">
-                <span className="fIcon"><FaEnvelope /></span>
-                <input placeholder="Email" name="email" type="email" onChange={(e) => hanldeOnChange(e)} value={user.email} />
-            </div>
-            <div className="input-field">
-                <span className="fIcon"><FaLock /></span>
-                <input type="password" name="password" placeholder="password" onChange={(e) => hanldeOnChange(e)} value={user.password} />
-            </div>
-            <div className='input-field d-flex align-items-center gap-2 justify-content-center'>
-                <div className='text-nowrap'>I'M A</div>
-                <select
-                    className="form-select w-50"
-                    aria-label="select"
-                    onChange={(e) => handleUserTypeChange(e)}
-                    defaultValue='patient'
+        <div className="container d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+            <form className="sign-up-form" onSubmit={handleSubmit} style={{ width: '400px' }}>
+                <h2 className="title">Đăng ký</h2>
+                <div className="input-field">
+                    <span className="fIcon"><FaUser /></span>
+                    <input placeholder="Họ và Tên" name="name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div className="input-field">
+                    <span className="fIcon"><FaUser /></span>
+                    <input placeholder="Mã số sinh viên" name="studentId" type="text" value={studentId} onChange={(e) => setStudentId(e.target.value)} />
+                </div>
+                <div>
+                    <div className="input-field">
+                        <span className="fIcon"><FaEnvelope /></span>
+                        <input placeholder="Email" name="email" type="email" value={email} onChange={handleEmailChange}  />
+                    </div>
+                    {emailError && <p style={{ color: 'red' }}>{emailError}</p>}
+                </div>
+                <div>
+                    <div className="input-field">
+                        <span className="fIcon"><FaLock /></span>
+                        <input type="password" name="password" placeholder="password" value={password} onChange={handlePasswordChange} />
+                    </div>
+                    {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>}
+                </div>
+                <div className='input-field d-flex align-items-center gap-2 justify-content-center'>
+                    <div className='text-nowrap'>Trường</div>
+                    <select
+                        className="form-select w-50"
+                        aria-label="select"
+                        onChange={handleUniversityChange}
+                        defaultValue=''
+                    >
+                        <option value='' disabled>Select a University</option>
+                        {universities.map(university => (
+                            <option key={university.id} value={university.id}>
+                                {university.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <button type="submit"
+                    className="btn btn-primary btn-block mt-2 iBtn"
                 >
-                    <option value="patient">Patient</option>
-                    <option value="doctor">Doctor</option>
-                </select>
-            </div>
-            {error.length && <h6 className="text-danger text-center">{error}</h6>}
-            {infoError && <h6 className="text-danger text-center">{infoError}</h6>}
-            <button type="submit"
-                className="btn btn-primary btn-block mt-2 iBtn"
-                disabled={
-                    passwordValidation.carLength && passwordValidation.numeric && passwordValidation.upperLowerCase && passwordValidation.specailChar && emailError.emailError ? "" : true
-                }
-            >
-                {loading ? <Spinner animation="border" variant="info" /> : "Sign Up"}
-            </button>
-
-            <div className="password-validatity mx-auto">
-
-                <div style={emailError.emailError ? { color: "green" } : { color: "red" }}>
-                    <p>{passwordValidation.numeric ? <FaCheck /> : <FaTimes />}
-                        <span className="ms-2">Must Have Valid Email.</span></p>
-                </div>
-
-                <div style={passwordValidation.carLength ? { color: "green" } : { color: "red" }}>
-                    <p>{passwordValidation.numeric ? <FaCheck /> : <FaTimes />}
-                        <span className="ms-2">Password Must Have atlast 8 character.</span></p>
-                </div>
-
-                <div style={passwordValidation.specailChar ? { color: "green" } : { color: "red" }}>
-                    <p>{passwordValidation.numeric ? <FaCheck /> : <FaTimes />}
-                        <span className="ms-2">Password Must Have a special cracter.</span></p>
-                </div>
-
-                <div style={passwordValidation.upperLowerCase ? { color: "green" } : { color: "red" }}>
-                    <p>{passwordValidation.numeric ? <FaCheck /> : <FaTimes />}
-                        <span className="ms-2">Password Must Have uppercase and lower case.</span></p>
-                </div>
-
-                <div style={passwordValidation.numeric ? { color: "green" } : { color: "red" }}>
-                    <p>{passwordValidation.numeric ? <FaCheck /> : <FaTimes />}
-                        <span className="ms-2">Password Must Have Number.</span></p>
-                </div>
-            </div>
-
-            <p className="social-text">Or Sign up with social account</p>
-            <SocialSignUp />
-        </form>
-
+                    Đăng ký
+                </button>
+                <p className="social-text">Or Sign up with a social account</p>
+                <SocialSignUp />
+            </form>
+        </div>
     );
 };
 

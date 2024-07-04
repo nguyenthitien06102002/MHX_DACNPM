@@ -42,7 +42,7 @@ const Choserole = () => {
 							</div>
 							<div
 							onClick={() => {
-								window.location.href = '/school';
+								window.location.href = '/login';
 								}} 
 							className="speicality-item text-center">
 								<div className="speicality-img">

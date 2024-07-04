@@ -3,7 +3,7 @@ import { FaEnvelope, FaLock } from 'react-icons/fa';
 import SocialSignUp from './SocialSignUp';
 import { useForm } from "react-hook-form";
 import Spinner from 'react-bootstrap/Spinner';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Toast } from 'react-bootstrap';
 import { useResetPasswordMutation, useUserLoginMutation } from '../../redux/api/authApi';
 import { message } from 'antd';
@@ -71,7 +71,7 @@ const SignIn = ({ handleResponse }) => {
 
     const handleLogin = async (email, password) => {
         try {
-            const response = await fetch('https://project-software-z6dy.onrender.com/auth/login', {
+            const response = await fetch('http://localhost:3700/users/login', {
                 method: 'POST',
                 headers: {
                     'accept': '*/*',
@@ -84,39 +84,57 @@ const SignIn = ({ handleResponse }) => {
             });
 
             const data = await response.json();
+
+            if (response.ok) {       
+                localStorage.setItem('token', data.token);         
+                localStorage.setItem('user', JSON.stringify(data.user));
+                if (data.user.role === 'student') {
+                    window.location.href = '/school';
+                }else if (data.user.role === 'admin') {
+                    window.location.href = '/listProjectAdmin';
+                } else {
+                    window.location.href = '/list-campaign';   
+                }
+            
+
+              
+            } else {
+             
+                console.error('Đăng nhập thất bại:', data.message);
+            }
             
             // Handle the response data here
-            if (response.ok) {
-                console.log(data.data.token);
-                localStorage.setItem("token", JSON.stringify(data.data.token));
-                const token = data?.data?.token;
-                // Decode the token here
-                const decodedToken = decodeToken(token);
-                // Access the user information from the decoded token
-                const userId = decodedToken?.id;
-                const userEmail = decodedToken?.email;
-                const userRole = decodedToken?.role;
-                const timestamp = decodedToken?.timestamp;
-                // Do something with the user information
+            // if (response.ok) {
+            //     console.log(data.data.token);
+            //     localStorage.setItem("token", JSON.stringify(data.data.token));
+            //     const token = data?.data?.token;
+            //     // Decode the token here
+            //     const decodedToken = decodeToken(token);
+            //     // Access the user information from the decoded token
+            //     const userId = decodedToken?.id;
+            //     const userEmail = decodedToken?.email;
+            //     const userRole = decodedToken?.role;
+            //     const timestamp = decodedToken?.timestamp;
+            //     // Do something with the user information
                 
-                console.log("User ID:", userId);
-                console.log("User Email:", userEmail);
-                console.log("User Role:", userRole);
-                console.log("Timestamp:", timestamp);
-                localStorage.setItem("role", JSON.stringify(userRole));
+            //     console.log("User ID:", userId);
+            //     console.log("User Email:", userEmail);
+            //     console.log("User Role:", userRole);
+            //     console.log("Timestamp:", timestamp);
+            //     localStorage.setItem("role", JSON.stringify(userRole));
 
-                if (userRole === 0) {
-                    window.location.href = '/listProjectAdmin';
-                } else if (userRole === 1) {
-                    window.location.href = '/list-campaign';
-                }
+            //     if (userRole === 0) {
+            //         window.location.href = '/listProjectAdmin';
+            //     } else if (userRole === 1) {
+            //         window.location.href = '/list-campaign';
+            //     }
 
 
-            } else {
-                // Handle the error response here
-                console.error(data?.message);
+            // } else {
+            //     // Handle the error response here
+            //     console.error(data?.message);
                 
-            }
+            // }
         } catch (error) {
             // Handle any errors here
             console.error(error);
@@ -134,28 +152,26 @@ const SignIn = ({ handleResponse }) => {
                     </form>
                     :
                     <><form className="sign-in-form">
-                        <h2 className="title">Sign in</h2>
+                        <h2 className="title">Đăng nhập</h2>
                         <div className="input-field">
                             <span className="fIcon"><FaEnvelope /></span>
-                            <input onChange={(e) => setEmail(e.target.value)} placeholder="Enter Your Email" type="email" />
+                            <input onChange={(e) => setEmail(e.target.value)} placeholder="Nhập email" type="email" />
                         </div>
                         {errors.email && <span className="text-danger">This field is required</span>}
                         <div className="input-field">
                             <span className="fIcon"><FaLock /></span>
-                            <input onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Enter Your Password" />
+                            <input onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Nhập mật khẩu" />
                         </div>
                         {errors.password && <span className="text-danger">This field is required</span>}
                         {infoError && <p className="text-danger">{infoError}</p>}
-                        {/* <div onClick={handleShowForgotPassword} className='text-bold' style={{ cursor: "pointer", color: '#4C25F5' }}>Forgot Password ?</div> */}
-                        {/* <button className="iBtn" value="sign In" onClick={() => handleLogin(email, password)}>
-                            {isLoading ? <Spinner animation="border" variant="info" /> : "Sign In"}
-                        </button> */}
-                        {/* <p className="social-text">Or Sign in with social platforms</p> */}
-                        {/* <SocialSignUp handleResponse={handleResponse} />  */}
+                      
                     </form>
-                        <button style={{marginLeft: '250px'}} className="iBtn" value="sign In" onClick={() => handleLogin(email, password)}>
-                            {isLoading ? <Spinner animation="border" variant="info" /> : "Sign In"}
-                        </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <button className="iBtn" value="sign In" onClick={() => handleLogin(email, password)}>
+                                {isLoading ? <Spinner animation="border" variant="info" /> : "Đăng nhập"}
+                            </button>
+                            <p>Chưa có tài khoản? <span><Link to="/signUp">Đăng ký</Link></span></p>
+                        </div>
                     </>
 
             }
