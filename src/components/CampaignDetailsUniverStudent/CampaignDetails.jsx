@@ -5,8 +5,8 @@ import Footer from '../Shared/Footer/Footer';
 import SubHeader from '../Shared/SubHeader';
 import { Navigate, useParams } from 'react-router-dom';
 import { Button } from 'antd';
-
-const CampaignDetails = () => {
+import { format } from 'date-fns';
+const CompaignDetailStudent = () => {
     const { id } = useParams();
     const [campaign, setCampaign] = useState(null);
 
@@ -24,27 +24,7 @@ const CampaignDetails = () => {
         fetchCampaign();
     }, [id]);
 
-    const handleApprove = async () => {
-        try {
-            const response = await fetch(`http://localhost:3700/campaigns/campaign/update-status/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'accept': '*/*',
-                    'Content-Type': 'application/json'
-                },
-            });
-
-            const updatedCampaign = await response.json();
-            if (response.ok) {
-                window.location.href = '/list-campaign';
-                alert('Duyệt chiến dịch thành công');
-            }
-
-        } catch (error) {
-            console.error('Error updating campaign status:', error);
-        }
-    };
-
+    
 
 
     return (
@@ -76,10 +56,9 @@ const CampaignDetails = () => {
                                                     <strong>Thời gian:</strong> {new Date(campaign.startAt).toLocaleDateString()} - {new Date(campaign.endAt).toLocaleDateString()}
                                                 </li>
                                                 <li className="list-group-item">
-                                                    <strong>Số lượng sinh viên cần:</strong> 213
+                                                    <strong>Thời gian tham gia:</strong> {format(new Date(campaign.joinedAt), 'dd-MM-yyyy HH:mm:ss')}
                                                 </li>
                                             </ul>
-
                                         </div>
                                     </div>
                                 </div>
@@ -93,4 +72,4 @@ const CampaignDetails = () => {
     );
 }
 
-export default CampaignDetails;
+export default CompaignDetailStudent;
