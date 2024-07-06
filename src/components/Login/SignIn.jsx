@@ -89,7 +89,7 @@ const SignIn = ({ handleResponse }) => {
                 localStorage.setItem('token', data.token);         
                 localStorage.setItem('user', JSON.stringify(data.user));
                 if (data.user.role === 'student') {
-                    window.location.href = '/school';
+                    window.location.href = '/list-campaign-student';
                 }else if (data.user.role === 'admin') {
                     window.location.href = '/listProjectAdmin';
                 } else {
