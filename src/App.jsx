@@ -37,7 +37,6 @@ function App() {
    
         <Route path='/createCampaigns' element={<CreateCampaigns />} />
         <Route path='/listProjectAdmin' element={<ListProject />} />
-        <Route path='/manageSchools' element={<ManageSchools />} />
         <Route path='/choseRole' element={<Choserole />} />
         <Route path='/' element={<Choserole />} />
         <Route path="/campaigns/:id" element={<CampaignDetails />} />
