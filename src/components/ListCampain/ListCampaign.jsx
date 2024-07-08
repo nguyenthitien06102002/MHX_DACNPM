@@ -60,11 +60,11 @@ const ListCampaign = () => {
             const data = await response.json();
             console.log('Profile data:', data);
             if (data.role === "university") {
-                const univer = data.universityId;
+                const univer = data.id;
                 console.log('ID user:', univer);
 
                 try {
-                    const response = await fetch(`http://localhost:3700/campaigns/campaign/${univer}`, {
+                    const response = await fetch(`http://localhost:3700/campaigns/campaign/byuserid/${univer}`, {
                         method: 'GET',
                         headers: {
                             'accept': '*/*',
@@ -104,7 +104,7 @@ const ListCampaign = () => {
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbFl4LFohrLy-RNdC7vp_c8M6PR0FFm55OxxjlmsIxow&s" alt="User Image" />
                 </div>
                 <div className="details d-flex flex-column align-items-center justify-content-center">
-                    <h5><Link to={`/campaigns/${campaign.id}`}>{campaign.name}</Link></h5>
+                    <h5><Link to={`/campaigns/${campaign.id}`}></Link></h5>
                     <div className="campaign-details">
                         <div className="detail-item">
                             <FaLocationArrow />
