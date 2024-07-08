@@ -57,7 +57,7 @@ const CompaignDetailStudent = () => {
                                                     <strong>Thời gian:</strong> {new Date(campaign.startAt).toLocaleDateString()} - {new Date(campaign.endAt).toLocaleDateString()}
                                                 </li>
                                                 <li className="list-group-item">
-                                                    {/* <strong>Thời gian tham gia:</strong> {campaign.joinedAt ? new Date(campaign.joinedAt).toLocaleDateString() : "N/A"} */}
+                                                    <strong>Thời gian tham gia:</strong> {campaign.joinedAt ? new Date(campaign.joinedAt).toLocaleDateString() : "N/A"}
                                                 </li>
                                             </ul>
                                         </div>
