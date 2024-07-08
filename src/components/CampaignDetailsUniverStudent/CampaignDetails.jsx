@@ -16,6 +16,7 @@ const CompaignDetailStudent = () => {
                 const response = await fetch(`http://localhost:3700/campaigns/campaign/info/${id}`);
                 const data = await response.json();
                 setCampaign(data);
+                console.log('Campaign:', data);
             } catch (error) {
                 console.error('Error fetching campaign:', error);
             }
@@ -30,7 +31,7 @@ const CompaignDetailStudent = () => {
     return (
         <>
             <Header />
-            <SubHeader title="Chi tiết chiến dịch" subtitle="Thông tin chi tiết về chiến dịch bạn đang quan tâm" />
+            <SubHeader title="Chi tiết chiến dịch"  />
             <div className="container campaign-details-container">
                 <div className="row justify-content-center">
                     <div className="col-lg-8 col-md-10">
@@ -56,7 +57,7 @@ const CompaignDetailStudent = () => {
                                                     <strong>Thời gian:</strong> {new Date(campaign.startAt).toLocaleDateString()} - {new Date(campaign.endAt).toLocaleDateString()}
                                                 </li>
                                                 <li className="list-group-item">
-                                                    <strong>Thời gian tham gia:</strong> {format(new Date(campaign.joinedAt), 'dd-MM-yyyy HH:mm:ss')}
+                                                    {/* <strong>Thời gian tham gia:</strong> {campaign.joinedAt ? new Date(campaign.joinedAt).toLocaleDateString() : "N/A"} */}
                                                 </li>
                                             </ul>
                                         </div>

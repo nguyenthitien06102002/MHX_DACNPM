@@ -28,7 +28,7 @@ const Confirmed = ({ id }) => {
         },
         {
             name: 'Kỹ năng',
-            selector: row => row.skill,
+            selector: row => row.info,
             sortable: true,
         },
         {
