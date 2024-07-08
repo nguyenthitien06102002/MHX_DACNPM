@@ -5,9 +5,9 @@ import { Button, Tabs } from "antd";
 import SubHeader from '../Shared/SubHeader';
 import Footer from '../Shared/Footer/Footer';
 import Header from '../Shared/Header/Header';
-
 import swal from 'sweetalert';
 import './index.css';
+
 const { TabPane } = Tabs;
 
 const ListCampaign = () => {
@@ -27,7 +27,6 @@ const ListCampaign = () => {
 
             const updatedCampaign = await response.json();
             if (response.ok) {
-               
                 swal({
                     title: "Success",
                     text: "Duyệt chiến dịch thành công",
@@ -59,11 +58,13 @@ const ListCampaign = () => {
                 }
             });
             const data = await response.json();
+            console.log('Profile data:', data);
             if (data.role === "university") {
                 const univer = data.id;
+                console.log('ID user:', univer);
 
                 try {
-                    const response = await fetch(`http://localhost:3700/campaigns/campaign/${univer}`, {
+                    const response = await fetch(`http://localhost:3700/campaigns/campaign/byuserid/${univer}`, {
                         method: 'GET',
                         headers: {
                             'accept': '*/*',
@@ -72,13 +73,18 @@ const ListCampaign = () => {
                     });
 
                     const data = await response.json();
-                    setCampaigns(data);
+                    console.log('Campaign data:', data);
+                    if (Array.isArray(data)) {
+                        setCampaigns(data);
+                    } else {
+                        console.error('Unexpected data format:', data);
+                    }
                 } catch (error) {
                     console.error('Error fetching campaigns:', error);
                 }
             }
         } catch (error) {
-            console.error('Error fetching campaigns:', error);
+            console.error('Error fetching profile:', error);
         }
     };
 
@@ -98,22 +104,21 @@ const ListCampaign = () => {
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbFl4LFohrLy-RNdC7vp_c8M6PR0FFm55OxxjlmsIxow&s" alt="User Image" />
                 </div>
                 <div className="details d-flex flex-column align-items-center justify-content-center">
-                    <h5><Link to={`/campaigns/${campaign.id}`}>{campaign.name}</Link></h5>
+                    <h5><Link to={`/campaigns/${campaign.id}`}></Link></h5>
                     <div className="campaign-details">
-                            <div className="detail-item">
-                                <FaLocationArrow />
-                                <strong style={{ color: 'black', fontSize: '26px' }} >Tên chiến dịch: {campaign.title.toUpperCase()}</strong>
-                            </div>
-                            <div className="detail-item">
-                                <FaCalendarAlt />
-                                <strong style={{ fontSize: '20px' }}>
-                                    {campaign.status2 === 0
-                                        ? `Đăng ký trước: ${new Date(campaign.startAt).toLocaleString()}`
-                                        : `Kết thúc: ${new Date(campaign.endAt).toLocaleString()}`}
-                                </strong>
-                            </div>
-
+                        <div className="detail-item">
+                            <FaLocationArrow />
+                            <strong style={{ color: 'black', fontSize: '26px' }}>Tên chiến dịch: {campaign.title.toUpperCase()}</strong>
                         </div>
+                        <div className="detail-item">
+                            <FaCalendarAlt />
+                            <strong style={{ fontSize: '20px' }}>
+                                {campaign.status2 === 0
+                                    ? `Đăng ký trước: ${new Date(campaign.startAt).toLocaleString()}`
+                                    : `Kết thúc: ${new Date(campaign.endAt).toLocaleString()}`}
+                            </strong>
+                        </div>
+                    </div>
                     <span className={`tag ${campaign.status === 0 ? 'not-registered' : 'registered'}`}>
                         {campaign.status === 0 ? 'Chờ duyệt' : 'Đã duyệt'}
                     </span>
@@ -137,8 +142,7 @@ const ListCampaign = () => {
     return (
         <>
             <Header />
-            <SubHeader title="Campaign" subtitle="Lorem ipsum dolor sit amet consectetur adipisicing." />
-
+            <SubHeader title="Các chiến dịch" />
             <div className="container">
                 <Tabs defaultActiveKey="0">
                     <TabPane tab="Chờ duyệt" key="0">
@@ -156,7 +160,8 @@ const ListCampaign = () => {
             <Footer />
         </>
     );
-}
+};
+
 const styles = `
 .campaign-card {
     background-color: #fff;
@@ -202,11 +207,12 @@ const styles = `
     color: #174ea6;
 }
 
- .campaign-details {
+.campaign-details {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
+
 .detail-item {
     display: flex;
     align-items: center;
@@ -292,9 +298,11 @@ const styles = `
     padding: 20px;
 }
 `;
+
 // Inject styles
 const styleSheet = document.createElement("style");
 styleSheet.type = "text/css";
 styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
+
 export default ListCampaign;

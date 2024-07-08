@@ -50,7 +50,7 @@ const CampaignDetails = () => {
     return (
         <>
             <Header />
-            <SubHeader title="Chi tiết chiến dịch" subtitle="Thông tin chi tiết về chiến dịch bạn đang quan tâm" />
+            <SubHeader title="Chi tiết chiến dịch"  />
             <div className="container campaign-details-container">
                 <div className="row justify-content-center">
                     <div className="col-lg-8 col-md-10">
