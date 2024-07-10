@@ -47,8 +47,7 @@ const CompaignDetailStudent = () => {
                                     </div>
                                     <div className="col-md-6">
                                         <div className="card-body">
-                                            <h2 className="card-title text-uppercase">{campaign.name}</h2>
-                                            <strong style={{ fontSize: '20px' }} className="card-text text-uppercase text-description">{campaign.title.toUpperCase()}</strong>
+                                            <strong style={{ fontSize: '20px' }} className="card-text text-uppercase text-description">{campaign.title}</strong>
                                             <ul className="list-group list-group-flush">
                                                 <li className="list-group-item">
                                                     <strong>Mô tả:</strong> {campaign.description}
