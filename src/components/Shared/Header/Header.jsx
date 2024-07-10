@@ -40,7 +40,7 @@ const Header = () => {
         setIsLogged(false);
         localStorage.removeItem('token');
         localStorage.removeItem('role');
-        window.location.href = '/login';
+        window.location.href = '/';
     }
 
     useEffect(() => {
