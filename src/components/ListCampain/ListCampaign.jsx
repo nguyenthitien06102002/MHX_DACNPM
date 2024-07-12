@@ -73,7 +73,12 @@ const ListCampaign = () => {
 
                     const data = await response.json();
                     console.log('Data:', data);
-                    setCampaigns(data);
+                        if (data && Array.isArray(data)) {
+                        setCampaigns(data);
+                    } else {
+                        setCampaigns([]);
+                    }
+                    
                 } catch (error) {
                     console.error('Error fetching campaigns:', error);
                 }
